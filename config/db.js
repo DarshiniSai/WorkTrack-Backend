@@ -1,22 +1,24 @@
 const mysql = require('mysql2/promise');
+require('dotenv').config(); 
 
 const pool = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'worktrack',
+  host: process.env.MYSQLHOST,
+  user: process.env.MYSQLUSER,
+  password: process.env.MYSQLPASSWORD,
+  database: process.env.MYSQLDATABASE,
+  port: process.env.MYSQLPORT || 3306,
   waitForConnections: true,
-  connectionLimit: 10, 
+  connectionLimit: 10,
   queueLimit: 0
 });
 
-pool.getConnection((err, connection) => {
-  if (err) {
-    console.error('Error connecting to MySQL:', err);
-    return;
-  }
-  console.log('Connected to MySQL');
-  connection.release(); 
-});
+pool.getConnection()
+  .then(connection => {
+    console.log('✅ Connected to MySQL via Railway');
+    connection.release();
+  })
+  .catch(err => {
+    console.error('❌ MySQL connection error:', err);
+  });
 
 module.exports = pool;
